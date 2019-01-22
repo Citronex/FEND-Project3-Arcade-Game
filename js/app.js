@@ -1,35 +1,158 @@
+//Timer from stackoverflow questions 5517597
+//Same timer used in project 2
+// let minutesLabel = document.getElementById("minutes");
+// let secondsLabel = document.getElementById("seconds");
+// let totalSeconds = 0;
+
+// function setTime() {
+//     ++totalSeconds;
+//     secondsLabel.innerHTML = pad(totalSeconds % 60);
+//     minutesLabel.innerHTML = pad(parseInt(totalSeconds / 60));
+//   }
+  
+//   function pad(val) {
+//     let valString = val + "";
+//     if (valString.length < 2) {
+//       return "0" + valString;
+//     } else {
+//       return valString;
+//     }
+//   }
+
+// let playingTime = setInterval(function(){ setTime() }, 1000);
+
+// function stopTimer() {
+//     clearInterval(playingTime);
+// }
+
+//draw game canvas
+const gameCanvas = {
+    canvasWidth: 505,
+    canvasHeight: 606
+}
+
+//ES6
+class Figure {
+    constructor(x, y, speed, sprite){
+        this.x = x;
+        this.y = y;
+        this.speed = speed;
+        this.sprite = sprite;   
+ }
+
+ // Draws the figure on the screen, required method for game
+    render(){  
+        ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+    }; 
+
+}
+
 // Enemies our player must avoid
-var Enemy = function() {
-    // Variables applied to each of our instances go here,
-    // we've provided one for you to get started
+class Enemy extends Figure {
+
+    constructor(x, y, speed, sprite = 'images/enemy-bug.png'){
+        super(x,y,speed,sprite);
+     }    
 
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
-    this.sprite = 'images/enemy-bug.png';
-};
+    // this.sprite = 'images/enemy-bug.png';
 
-// Update the enemy's position, required method for game
-// Parameter: dt, a time delta between ticks
-Enemy.prototype.update = function(dt) {
+    update(dt){
     // You should multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
     // all computers.
-};
+        this.x += this.speed * dt;
 
-// Draw the enemy on the screen, required method for game
-Enemy.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-};
+    //Updates the Enemy location (you need to implement)
+        if(this.x > gameCanvas.canvasWidth){
+            this.x =-100;
+            this.speed= (Math.floor(Math.random() * 200) + 50); //test this speed
+        }
+
+    //Handles collision with the Player (you need to implement)
+        if ((player.x + 80 > this.x) && (player.x < this.x + 80) &&
+        (player.y + 60 > this.y) && (player.y < this.y + 60)
+    ){
+        player.x = Math.floor(Math.random() * 5)*100;
+        player.y = 400;
+    };
+    }
+   
+}
+
+ //load images
+Resources.load([
+    'images/char-pink-girl.png',
+    'images/char-horn-girl.png',
+    'images/char-princess-girl.png',
+    'images/char-cat-girl.png',
+    'images/Gem Blue.png',
+    'images/Gem Orange.png',
+    'images/Gem Green.png',
+    'images/Heart.png'
+]);
 
 // Now write your own player class
 // This class requires an update(), render() and
 // a handleInput() method.
+class Player extends Figure {
+    constructor(x, y, speed, sprite){
+        super(x, y, speed, sprite = ['images/char-boy.png', 'images/char-pink-girl.png', 'images/char-horn-girl', 'images/char-cat-girl.png']);
+        this.sprite = sprite[Math.floor(Math.random()*(sprite.length))];
+    }
 
+    //render() handled by the parent class
+
+    //Update player positioning and return to start position once finished
+    update() {
+        if (this.y > gameCanvas.canvasHeight * 2/3) {
+            this.y = gameCanvas.canvasHeight * 2/3;
+        }
+        if (this.x > gameCanvas.canvasWidth * 4/5) {
+            this.x = gameCanvas.canvasWidth * 4/5;
+        }
+        if (this.x < 0) {
+            this.x = 0;
+        }
+        else if (this.y < 0) {
+            this.x = (Math.floor(Math.random() * 5) *100);
+            this.y = gameCanvas.canvasHeight * 4/5;
+        }
+    }
+
+    //handleInput() , which should receive user input, allowedKeys
+    // (the key which was pressed) and move the player according to
+    // that input. In particular:
+    handleInput(key){
+        switch (key) {
+            case 'left':
+                this.x -= this.speed + 50; // half of the cell
+                break;
+            case 'up':
+                this.y -= this.speed + 40; //half of the cell
+                break;
+            case 'right':
+                this.x += this.speed + 50;
+                break;
+            case 'down':
+                this.y += this.speed + 40;
+                break;
+        }
+    };
+}
 
 // Now instantiate your objects.
-// Place all enemy objects in an array called allEnemies
-// Place the player object in a variable called player
 
+//Array location for center of the 3 possible y axis locations for enemies
+let enemylocation = [60, 140, 220];
+
+// Place all enemy objects in an array called allEnemies
+let enemy;
+let allEnemies = enemylocation.map(y => enemy = new Enemy(0, y, (Math.floor(Math.random() *200) + 100)));
+
+// Place the player object in a variable called player
+let player = new Player(200, 410, 50);
 
 
 // This listens for key presses and sends the keys to your
@@ -44,3 +167,28 @@ document.addEventListener('keyup', function(e) {
 
     player.handleInput(allowedKeys[e.keyCode]);
 });
+
+
+//ES5
+// Enemies our player must avoid
+// var Enemy = function() {
+    // Variables applied to each of our instances go here,
+    // we've provided one for you to get started
+
+    // The image/sprite for our enemies, this uses
+    // a helper we've provided to easily load images
+//     this.sprite = 'images/enemy-bug.png';
+// };
+
+// Update the enemy's position, required method for game
+// Parameter: dt, a time delta between ticks
+// Enemy.prototype.update = function(dt) {
+    // You should multiply any movement by the dt parameter
+    // which will ensure the game runs at the same speed for
+    // all computers.
+// };
+
+// Draw the enemy on the screen, required method for game
+// Enemy.prototype.render = function() {
+//     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+// };
