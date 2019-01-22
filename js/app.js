@@ -67,7 +67,7 @@ class Enemy extends Figure {
     //Updates the Enemy location (you need to implement)
         if(this.x > gameCanvas.canvasWidth){
             this.x =-100;
-            this.speed= (Math.floor(Math.random() * 200) + 50); //test this speed
+            this.speed= (Math.floor(Math.random() * 200) + 50);
         }
 
     //Handles collision with the Player (you need to implement)
@@ -127,10 +127,10 @@ class Player extends Figure {
     handleInput(key){
         switch (key) {
             case 'left':
-                this.x -= this.speed + 50; // half of the cell
+                this.x -= this.speed + 50; 
                 break;
             case 'up':
-                this.y -= this.speed + 40; //half of the cell
+                this.y -= this.speed + 40; 
                 break;
             case 'right':
                 this.x += this.speed + 50;
